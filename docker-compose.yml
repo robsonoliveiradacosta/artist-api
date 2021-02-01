@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+
+  keycloak:
+    build: keycloak/
+    image: robsondeveloper/artist-keycloak:1
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./keycloak/h2-data/:/opt/jboss/keycloak/standalone/data/
+    networks: 
+      - artist_network
+    container_name: artist_keycloak
+
+  api:
+    build: .
+    image: robsondeveloper/artist-api:1
+    ports:
+      - "8081:8081"
+    networks: 
+      - artist_network
+    depends_on: 
+      - keycloak
+    container_name: artist_api
+
+networks: 
+  artist_network:
+    name: artist_network
+    driver: bridge
