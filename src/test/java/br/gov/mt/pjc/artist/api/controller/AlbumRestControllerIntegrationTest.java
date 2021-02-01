@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ActiveProfiles;
 
 import br.gov.mt.pjc.artist.api.contract.request.AlbumRequest;
 import br.gov.mt.pjc.artist.api.contract.request.ArtistIdRequest;
@@ -22,6 +23,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
 public class AlbumRestControllerIntegrationTest {
 
 	@LocalServerPort
