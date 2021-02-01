@@ -1,6 +1,8 @@
 package br.gov.mt.pjc.artist.service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
@@ -12,8 +14,11 @@ import org.springframework.stereotype.Service;
 
 import br.gov.mt.pjc.artist.api.contract.request.AlbumRequest;
 import br.gov.mt.pjc.artist.api.contract.response.AlbumResponse;
+import br.gov.mt.pjc.artist.api.contract.response.CoverResponse;
 import br.gov.mt.pjc.artist.domain.model.Album;
+import br.gov.mt.pjc.artist.domain.model.Cover;
 import br.gov.mt.pjc.artist.domain.repository.AlbumRepository;
+import br.gov.mt.pjc.artist.domain.repository.CoverRepository;
 import br.gov.mt.pjc.artist.exception.ResourceNotFoundException;
 
 @Service
@@ -21,10 +26,15 @@ public class AlbumService {
 
 	private final AlbumRepository repository;
 	private final ModelMapper modelMapper;
+	private final CoverRepository coverRepository;
+	private final MinioService minioService;
 
-	public AlbumService(AlbumRepository repository, ModelMapper modelMapper) {
+	public AlbumService(AlbumRepository repository, ModelMapper modelMapper, CoverRepository coverRepository,
+			MinioService minioService) {
 		this.repository = repository;
 		this.modelMapper = modelMapper;
+		this.coverRepository = coverRepository;
+		this.minioService = minioService;
 	}
 
 	public List<AlbumResponse> findAll() {
@@ -70,12 +80,33 @@ public class AlbumService {
 		repository.delete(album);
 	}
 
+	@Transactional
+	public void addCover(Long id, String objectName) {
+		Cover cover = new Cover(id, objectName);
+		coverRepository.save(cover);
+	}
+
+	@Transactional
+	public void removeCover(String objectName) {
+		Optional<Cover> optionalCover = coverRepository.findByObjectName(UUID.fromString(objectName));
+		if (optionalCover.isPresent()) {
+			coverRepository.delete(optionalCover.get());
+		}
+	}
+
 	private Album findBy(Long id) {
 		return repository.findById(id).orElseThrow(() -> new ResourceNotFoundException());
 	}
 
 	private AlbumResponse toResponse(Album album) {
-		return modelMapper.map(album, AlbumResponse.class);
+		AlbumResponse albumResponse = modelMapper.map(album, AlbumResponse.class);
+		if (!album.getCovers().isEmpty()) {
+			List<CoverResponse> covers = album.getCovers().stream()
+					.map(cover -> modelMapper.map(cover, CoverResponse.class)).collect(Collectors.toList());
+			covers.forEach(c -> c.setUrl(minioService.getUrl(c.getObjectName())));
+			albumResponse.setCovers(covers);
+		}
+		return albumResponse;
 	}
 
 }

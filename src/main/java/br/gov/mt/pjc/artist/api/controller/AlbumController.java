@@ -18,19 +18,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import br.gov.mt.pjc.artist.api.contract.request.AlbumRequest;
 import br.gov.mt.pjc.artist.api.contract.response.AlbumResponse;
 import br.gov.mt.pjc.artist.service.AlbumService;
+import br.gov.mt.pjc.artist.service.MinioService;
 
 @RestController
 @RequestMapping("/v1/albums")
 public class AlbumController {
 
 	private final AlbumService service;
+	private final MinioService minioService;
 
-	public AlbumController(AlbumService service) {
+	public AlbumController(AlbumService service, MinioService minioService) {
 		this.service = service;
+		this.minioService = minioService;
 	}
 
 	@GetMapping
@@ -68,6 +72,19 @@ public class AlbumController {
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void delete(@PathVariable Long id) {
 		service.delete(id);
+	}
+
+	@PutMapping(path = "/{id}/covers")
+	public void uploadCover(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+		service.findById(id);
+		String objectName = minioService.upload(file);
+		service.addCover(id, objectName);
+	}
+
+	@DeleteMapping(path = "/covers/{objectName}")
+	public void deleteCover(@PathVariable String objectName) {
+		minioService.remove(objectName);
+		service.removeCover(objectName);
 	}
 
 }
