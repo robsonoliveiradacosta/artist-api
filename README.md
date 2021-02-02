@@ -21,6 +21,10 @@ cd artist-api
 ### Como rodar o Back End
 
 ```
+# edite o arquivo hosts, no windows C:\Windows\System32\drivers\etc\hosts, no linux/mac em /etc/hosts
+# adicione o seguinte conteudo:
+127.0.0.1 keycloak
+
 # clone o repositório
 git clone https://github.com/robsondeveloper/artist-api.git
 
