@@ -16,6 +16,10 @@
 	<description>API REST sobre artistas e álbuns</description>
 	<properties>
 		<java.version>11</java.version>
+		<keycloak.version>12.0.2</keycloak.version>
+		<modelmapper.version>2.3.0</modelmapper.version>
+		<minio.version>8.0.3</minio.version>
+		<springdoc-openapi.version>1.5.3</springdoc-openapi.version>
 	</properties>
 
 	<dependencyManagement>
@@ -23,7 +27,7 @@
 			<dependency>
 				<groupId>org.keycloak.bom</groupId>
 				<artifactId>keycloak-adapter-bom</artifactId>
-				<version>12.0.2</version>
+				<version>${keycloak.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -50,12 +54,12 @@
 		<dependency>
 			<groupId>org.modelmapper</groupId>
 			<artifactId>modelmapper</artifactId>
-			<version>2.3.0</version>
+			<version>${modelmapper.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.minio</groupId>
 			<artifactId>minio</artifactId>
-			<version>8.0.3</version>
+			<version>${minio.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -73,6 +77,16 @@
 		<dependency>
 			<groupId>org.keycloak</groupId>
 			<artifactId>keycloak-spring-security-adapter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-ui</artifactId>
+			<version>${springdoc-openapi.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-data-rest</artifactId>
+			<version>${springdoc-openapi.version}</version>
 		</dependency>
 
 		<dependency>
